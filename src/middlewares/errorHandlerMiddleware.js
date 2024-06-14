@@ -6,6 +6,8 @@ export const errorHandlerMiddleware = (error, req, res, next) => {
     res.status(error.status).json({
       status: error.status,
       message: error.message,
+      errors: error.errors || [],
+
     });
   } else if (error.name === 'ValidationError') {
     res.status(400).json({

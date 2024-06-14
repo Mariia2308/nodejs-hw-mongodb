@@ -1,15 +1,36 @@
+import { Types } from "mongoose";
 import { getAllContacts, getContactById,upsertContact, createContact, deleteContactById } from "../services/contacts.js";
+import createHttpError from "http-errors";
+import { parsePaginationParams } from "../pagination/paginationParams.js";
+import { parseFilters } from "../utils/parseFilters.js";
+
 export const getContactsController = async (req, res) => {
-    const contacts = await getAllContacts();
+  const { page, perPage } = parsePaginationParams(req.query);
+  const { sortBy, sortOrder } = req.query;
+  const filter = parseFilters(req.query);
+
+  try {
+    const contacts = await getAllContacts(page, perPage, sortBy || '_id', sortOrder || 'asc', filter);
     res.json({
-        status: 200,
-        message: 'Successfully found contacts!',
-        data: contacts,
+      status: 200,
+      message: 'Successfully found contacts!',
+      data: contacts,
     });
+  } catch (error) {
+    console.error('Error in getContactsController:', error);
+    res.status(500).json({
+      status: 500,
+      message: 'Internal Server Error',
+    });
+  }
 };
 
-export const getContactByIdController = async (req, res) => {
+
+export const getContactByIdController = async (req, res, next) => {
     const id = req.params.contactId;
+    if(!Types.ObjectId.isValid(id)) {
+        return next(createHttpError(400, 'Invalid contact id!'));
+    }
     const contact = await getContactById(id);
     
     res.json({
