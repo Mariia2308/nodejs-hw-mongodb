@@ -5,17 +5,19 @@ import { env } from '../utils/env.js';
 import { ENV_VARS } from '../constants/index.js';
 import { errorHandlerMiddleware } from '../middlewares/errorHandlerMiddleware.js';
 import { notFoundMiddleware } from '../middlewares/notFoundMiddleware.js';
-import router from '../routers/contacts.js';
+import rootRouter from '../routers/index.js';
+import cookiesParser from 'cookie-parser';
 
 
 export const startServer = () => {
   const app = express();
 
   app.use(express.json({
-    limit: '10kb',
+    limit: '1mb',
     type: ['application/json','application/vnd.api+json'],
   }));
   app.use(cors());
+  app.use(cookiesParser());
 
   app.use(
     pino({
@@ -24,7 +26,7 @@ export const startServer = () => {
       },
     }),
   );
-  app.use(router);
+  app.use(rootRouter);
 
 
   app.use(notFoundMiddleware);

@@ -6,15 +6,23 @@ import{ ctrlWrapper } from "../middlewares/ctrlWrapper.js";
 import { validateBody } from "../middlewares/validateBody.js";
 import { createContactsSchema } from "../validationMongoDB/contacts.js";
 import { updateContactsSchema } from "../validationMongoDB/contactsUpdate.js";
-const router = Router();
+import { authintificate } from "../middlewares/authintificate.js";
+import { validateMongoId } from "../middlewares/validateMongoId.js";
 
-  router.get('/contacts', ctrlWrapper(getContactsController));
+const contactsRouter = Router();
 
-router.get('/contacts/:contactId', ctrlWrapper(getContactByIdController));
-router.post('/contacts', validateBody(createContactsSchema), ctrlWrapper(createContactController));
-router.patch('/contacts/:contactId',validateBody(updateContactsSchema), ctrlWrapper(patchContactController));
-router.put('/contacts/:contactId',validateBody(createContactsSchema), ctrlWrapper(putContactController));
-router.delete('/contacts/:contactId', ctrlWrapper(deleteContactByIdController));
+
+
+contactsRouter.use('/:contactId', validateMongoId('contactId'));
+//contactsRouter.use(authintificate);
+
+contactsRouter.get('/', ctrlWrapper(getContactsController));
+
+contactsRouter.get('/:contactId', ctrlWrapper(getContactByIdController));
+contactsRouter.post('/', validateBody(createContactsSchema), ctrlWrapper(createContactController));
+contactsRouter.patch('/:contactId',validateBody(updateContactsSchema), ctrlWrapper(patchContactController));
+contactsRouter.put('/:contactId',validateBody(createContactsSchema), ctrlWrapper(putContactController));
+contactsRouter.delete('/:contactId', ctrlWrapper(deleteContactByIdController));
  
 
-export default router;
+export default contactsRouter;
