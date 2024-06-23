@@ -32,7 +32,7 @@ export const startServer = () => {
   });
 
   app.get('/contacts/:contactId', async (req, res) => {
-    const id = req.params.studentId;
+    const id = req.params.contactId;
     const contact = await getContactById(id);
 
     if (!contact) {
