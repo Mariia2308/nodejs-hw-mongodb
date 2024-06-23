@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { getAllContacts, getContactById,upsertContact, createContact, deleteContactById } from "../services/contacts.js";
 import createHttpError from "http-errors";
-import { parsePaginationParams } from "../pagination/paginationParams.js";
+import { parsePaginationParams } from "../utils/paginationParams.js";
 import { parseFilters } from "../utils/parseFilters.js";
 
 export const getContactsController = async (req, res) => {
@@ -55,12 +55,12 @@ export const createContactController = async (req, res) => {
 export const patchContactController = async (req, res) => {
   const { body } = req;
   const { contactId } = req.params;
-  const { contact } = await upsertContact(contactId, body);
+  const contact  = await upsertContact(contactId, body);
 
   res.status(200).json({
     status: 200,
     message: `Successfully patched contact!`,
-    data: contact,
+    data:  contact ,
   });
 };
 
@@ -80,7 +80,18 @@ export const putContactController = async (req, res) => {
   });
 };
 export const deleteContactByIdController = async (req, res) => {
-    const id = req.params.contactId;
-    await deleteContactById(id);
-    res.status(204).send();
+ const id = req.params.contactId;
+  const contact = await getContactById(id);
+  
+  if (!contact) {
+    return res.status(404).json({
+      status: 404,
+      message: `Contact with id ${id} not found!`,
+    });
+  }
+  
+
+  await deleteContactById(id);
+  
+  res.status(204).send();
 };

@@ -3,8 +3,8 @@ import { Router } from "express";
 import { ctrlWrapper } from "../middlewares/ctrlWrapper.js";
 import { loginUserController,  registerUserController } from "../controllers/auth.js"; 
 import { validateBody } from "../middlewares/validateBody.js"; 
-import { registerUserSchema } from "../validationMongoDB/registerUserSchema.js";
-import { loginUserSchema } from "../validationMongoDB/loginSchema.js";
+import { registerUserSchema } from "../validations/registerUserSchema.js";
+import { loginUserSchema } from "../validations/loginSchema.js";
 import { RefreshTokenController } from "../controllers/auth.js";
 import { logoutUserController } from "../controllers/auth.js";
 

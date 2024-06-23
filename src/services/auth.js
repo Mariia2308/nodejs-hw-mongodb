@@ -1,88 +1,88 @@
 // src/services/auth.js
 import createHttpError from "http-errors";
-import { User } from "../models/user.js";
+import { User } from "../db/models/user.js";
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import { Session } from "../models/session.js";
+import { Session } from "../db/models/session.js";
 const createSession = () => {
-    return {
-        refreshTokenValidity: new Date(Date.now() + 60 * 7 * 24 * 60 * 1000),
-        accessTokenValidity: new Date(Date.now() + 15 * 60 * 1000),
-        accessToken: crypto.randomBytes(64).toString('base64'),
-        refreshToken: crypto.randomBytes(64).toString('base64'),
-    };
-
+  return {
+    accessToken: crypto.randomBytes(40).toString('base64'),
+    refreshToken: crypto.randomBytes(40).toString('base64'),
+    accessTokenValidUntil: Date.now() + 1000 * 60 * 15, // 15 minutes,
+    refreshTokenValidUntil: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days,
+  };
 };
 
 export const createUser = async (payload) => {
-    const existingUser = await User.findOne({ email: payload.email });
-    if (existingUser) {
-        {
-            throw createHttpError(409, 'Email in use');
-        };
-    };
-    const hashedPassword = await bcrypt.hash(payload.password, 10);
-    return await User.create({
-        ...payload,
-        password: hashedPassword,
-    });
+  const hashedPassword = await bcrypt.hash(payload.password, 10);
+
+  const user = await User.findOne({ email: payload.email });
+
+  if (user) {
+    throw createHttpError(
+      409,
+      'User with this email is already present in database!',
+    );
+  }
+
+  return await User.create({
+    ...payload,
+    password: hashedPassword,
+  });
 };
+
 export const loginUser = async ({ email, password }) => {
-    const user = await User.findOne({ email });
-    if (!user) {
-        {
-            throw createHttpError(404, 'User not found');
-        };
-    };
+  const user = await User.findOne({ email });
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) {
-        {
-            throw createHttpError(401, 'Wrong password');
-        };
-    };
+  if (!user) {
+    throw createHttpError(404, 'User not found!');
+  }
 
-    await Session.deleteOne({ userId: user._id });
+  const areEqual = await bcrypt.compare(password, user.password);
 
+  if (!areEqual) {
+    throw createHttpError(401, 'Unauthorized');
+  }
 
-    return await Session.create({
-        userId: user._id,
-        ...createSession(),
-    });
+  await Session.deleteOne({ userId: user._id });
 
-
+  return await Session.create({
+    userId: user._id,
+    ...createSession(),
+  });
 };
 
 export const logoutUser = async ({ sessionId, sessionToken }) => {
-    return await Session.deleteOne({
-        _id: sessionId,
-        refreshToken: sessionToken,
-    });
+  return await Session.deleteOne({
+    _id: sessionId,
+    refreshToken: sessionToken,
+  });
 };
 
 export const refreshSession = async ({ sessionId, sessionToken }) => {
-    const session = await Session.findOne({
-        _id: sessionId,
-        refreshToken: sessionToken
-    });
+  const session = await Session.findOne({
+    _id: sessionId,
+    refreshToken: sessionToken,
+  });
 
-    if (!session) {
-        throw createHttpError(401, 'Invalid session');
-    };
+  if (!session) {
+    throw createHttpError(401, 'Session not found!');
+  }
 
-    if (Date.now() > session.refreshTokenValidity) {
-        throw createHttpError(401, 'Session expired');
-    };
-    const user = await User.findById(session.userId);
+  if (new Date() > session.refreshTokenValidUntil) {
+    throw createHttpError(401, 'Refresh token is expired!');
+  }
 
-    if (!user) {
-        throw createHttpError(401, 'Invalid session');
-    };
+  const user = await User.findById(session.userId);
 
-    await Session.deleteOne({ _id: session._id });
+  if (!user) {
+    throw createHttpError(401, 'Session not found!');
+  }
 
-    return await Session.create({
-        userId: user._id,
-        ...createSession(),
-    });
+  await Session.deleteOne({ _id: sessionId });
+
+  return await Session.create({
+    userId: user._id,
+    ...createSession(),
+  });
 };

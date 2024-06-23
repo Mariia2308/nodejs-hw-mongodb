@@ -4,9 +4,9 @@ import { Router } from "express";
 import { getContactsController, getContactByIdController, createContactController,patchContactController, putContactController, deleteContactByIdController  } from "../controllers/contacts.js";
 import{ ctrlWrapper } from "../middlewares/ctrlWrapper.js";
 import { validateBody } from "../middlewares/validateBody.js";
-import { createContactsSchema } from "../validationMongoDB/contacts.js";
-import { updateContactsSchema } from "../validationMongoDB/contactsUpdate.js";
-import { authintificate } from "../middlewares/authintificate.js";
+import { createContactsSchema } from "../validations/contacts.js";
+import { updateContactsSchema } from "../validations/contactsUpdate.js";
+import { authenticate } from "../middlewares/authenticate.js";
 import { validateMongoId } from "../middlewares/validateMongoId.js";
 
 const contactsRouter = Router();
@@ -14,7 +14,7 @@ const contactsRouter = Router();
 
 
 contactsRouter.use('/:contactId', validateMongoId('contactId'));
-//contactsRouter.use(authintificate);
+contactsRouter.use('/', authenticate);
 
 contactsRouter.get('/', ctrlWrapper(getContactsController));
 
