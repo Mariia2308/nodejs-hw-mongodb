@@ -14,7 +14,7 @@ export const parsePaginationParams = (query) => {
     return {
         
         page: parceNumber(page, 1),
-        perPage: parceNumber(perPage, 5),
+        perPage: parceNumber(perPage, 10),
     
     };
 };
