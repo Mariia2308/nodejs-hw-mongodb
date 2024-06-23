@@ -66,21 +66,27 @@ export const createContact = async (payload) => {
 
 
 export const upsertContact = async (id, payload, options = {}) => {
-  const rawResult = await Contact.findByIdAndUpdate(id, payload, {
-    new: true,
-    includeResultMetadata: true,
-    ...options,
-  });
+  try {
+    const rawResult = await Contact.findByIdAndUpdate(id, payload, {
+      new: true,
+      upsert: true,
+      ...options,
+    });
 
-  if (!rawResult || !rawResult.value) {
-    throw createHttpError(404, 'Contact not found');
+    if (!rawResult) {
+      throw createHttpError(404, 'Contact not found');
+    }
+
+    return {
+      contact: rawResult,
+      isNew: !rawResult?.lastErrorObject?.updatedExisting,
+    };
+  } catch (error) {
+    console.error('Error in upsertContact:', error);
+    throw createHttpError(500, 'Internal Server Error');
   }
-
-  return {
-    student: rawResult.value,
-    isNew: !rawResult?.lastErrorObject?.updatedExisting,
-  };
 };
+
 
 export const deleteContactById = async (id) => {
   await Contact.findByIdAndDelete(id);

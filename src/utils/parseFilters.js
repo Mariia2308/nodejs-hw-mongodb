@@ -15,6 +15,6 @@ export const parseFilters = (query) => {
 
     return {
         isFavourite: parseBoolean(query.isFavourite, false),
-        contactType: parseString(query.contactType, 'personal'), 
+        contactType: parseString(query.contactType, ''), 
     };
  };
