@@ -31,7 +31,7 @@ export const upsertContact = async (id, payload, options = {}) => {
   }
 
   return {
-    student: rawResult.value,
+    contact: rawResult.value,
     isNew: !rawResult?.lastErrorObject?.updatedExisting,
   };
 };

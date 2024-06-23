@@ -1,18 +1,18 @@
 import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
-import { env } from '../utils/env.js';
-import { ENV_VARS } from '../constants/index.js';
-import { errorHandlerMiddleware } from '../middlewares/errorHandlerMiddleware.js';
-import { notFoundMiddleware } from '../middlewares/notFoundMiddleware.js';
-import router from '../routers/contacts.js';
+import { env } from './utils/env.js';
+import { ENV_VARS } from './constants/index.js';
+import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js';
+import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
+import router from './routers/contacts.js';
 
 
 export const startServer = () => {
   const app = express();
 
   app.use(express.json({
-    limit: '10kb',
+    limit: '1mb',
     type: ['application/json','application/vnd.api+json'],
   }));
   app.use(cors());
