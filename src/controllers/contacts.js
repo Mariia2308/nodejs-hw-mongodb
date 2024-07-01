@@ -10,11 +10,11 @@ export const getContactsController = async (req, res) => {
   const filter = parseFilters(req.query);
 
   try {
-    const contacts = await getAllContacts(page, perPage, sortBy || '_id', sortOrder || 'asc', filter);
+    const data = await getAllContacts(page, perPage, sortBy || '_id', sortOrder || 'asc', filter);
     res.json({
       status: 200,
       message: 'Successfully found contacts!',
-      data: contacts,
+      data: data,
     });
   } catch (error) {
     console.error('Error in getContactsController:', error);
