@@ -95,7 +95,18 @@ export const putContactController = async (req, res) => {
   });
 };
 export const deleteContactByIdController = async (req, res) => {
-    const id = req.params.contactId;
-    await deleteContactById(id);
-    res.status(204).send();
+ const id = req.params.contactId;
+  const contact = await getContactById(id);
+  
+  if (!contact) {
+    return res.status(404).json({
+      status: 404,
+      message: `Contact with id ${id} not found!`,
+    });
+  }
+  
+
+  await deleteContactById(id);
+  
+  res.status(204).send();
 };

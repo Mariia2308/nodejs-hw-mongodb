@@ -3,11 +3,11 @@ import Joi from 'joi';
 
 export const createContactsSchema = Joi.object(
   {
-    name: Joi.string().min(3).max(30).required(),
+    name: Joi.string().min(3).max(30),
     phoneNumber: Joi.string().min(3).max(30),
     email: Joi.string().email(),  
     isFavourite: Joi.boolean(),
-    contactType: Joi.string().valid('work', 'home', 'personal').required(),
+    contactType: Joi.string().valid('work', 'home', 'personal'),
     createdAt: Joi.date().default(Date.now), 
     updatedAt: Joi.date().default(Date.now),  
   },

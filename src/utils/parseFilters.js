@@ -14,7 +14,7 @@ const parseString = (unknown, defaultValue) => {
 export const parseFilters = (query) => {
 
     return {
-        isFavourite: parseBoolean(query.isFavourite, false),
-        contactType: parseString(query.contactType, ''), 
+        isFavourite: parseBoolean(query.isFavourite ),
+        contactType: parseString(query.contactType), 
     };
  };
