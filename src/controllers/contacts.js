@@ -27,7 +27,8 @@ export const getContactsController = async (req, res) => {
 
 
 export const getContactByIdController = async (req, res, next) => {
-    const id = req.params.contactId;
+  const id = req.params.contactId;
+  
     if(!Types.ObjectId.isValid(id)) {
         return next(createHttpError(400, 'Invalid contact id!'));
     }
@@ -41,7 +42,8 @@ export const getContactByIdController = async (req, res, next) => {
 };
   
 export const createContactController = async (req, res) => {
-    const contact = await createContact(req.body);
+      const { body } = req;
+    const contact = await createContact(body, req.user._id);
     
 
     res.status(201).json({
