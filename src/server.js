@@ -5,7 +5,8 @@ import { env } from './utils/env.js';
 import { ENV_VARS } from './constants/index.js';
 import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js';
 import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
-import router from './routers/contacts.js';
+import rootRouter from './routers/index.js';
+import cookieParser from 'cookie-parser';
 
 
 export const startServer = () => {
@@ -16,6 +17,7 @@ export const startServer = () => {
     type: ['application/json','application/vnd.api+json'],
   }));
   app.use(cors());
+  app.use(cookieParser());
 
   app.use(
     pino({
@@ -24,7 +26,7 @@ export const startServer = () => {
       },
     }),
   );
-  app.use(router);
+  app.use(rootRouter);
 
 
   app.use(notFoundMiddleware);

@@ -17,13 +17,14 @@ const createPaginationInfo = (page, perPage, total) => {
 };
 
 
-export const getAllContacts = async (
+export const getAllContacts = async ({
   page = 1,
   perPage = 10,
   sortBy = '_id',
   sortOrder = 'asc',
-  filter = {}
-) => {
+  filter = {},
+  userId,
+}) => {
   const skip = (page - 1) * perPage;
 
   const ContactFilter = Contact.find();
@@ -35,6 +36,9 @@ export const getAllContacts = async (
   if (filter.contactType) {
     ContactFilter.where('contactType').equals(filter.contactType);
   }
+
+
+  ContactFilter.where('parentId').equals(userId);
 
   const [contactsCount, contacts] = await Promise.all([
     ContactFilter.clone().countDocuments(),
@@ -59,8 +63,8 @@ export const getContactById = async (id) => {
   return contact;
 };
 
-export const createContact = async (payload) => {
-  const contact = await Contact.create(payload);
+export const createContact = async (payload, userId) => {
+  const contact = await Contact.create({ ...payload, parentId: userId });
   return contact;
 };
 

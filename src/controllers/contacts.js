@@ -6,11 +6,23 @@ import { parseFilters } from "../utils/parseFilters.js";
 
 export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
-  const { sortBy, sortOrder } = req.query;
+  const sortBy = req.query.sortBy?.trim() || '_id';
+  const sortOrder = req.query.sortOrder?.trim() || 'asc';
   const filter = parseFilters(req.query);
 
   try {
-    const data = await getAllContacts(page, perPage, sortBy || '_id', sortOrder || 'asc', filter);
+
+    filter.userId = req.user._id;
+
+    const data = await getAllContacts({
+      page,
+      perPage,
+      sortBy,
+      sortOrder,
+      filter,
+      userId: req.user._id,
+    });
+    
     res.json({
       status: 200,
       message: 'Successfully found contacts!',
@@ -24,6 +36,8 @@ export const getContactsController = async (req, res) => {
     });
   }
 };
+
+
 
 
 export const getContactByIdController = async (req, res, next) => {
@@ -41,7 +55,7 @@ export const getContactByIdController = async (req, res, next) => {
 };
   
 export const createContactController = async (req, res) => {
-    const contact = await createContact(req.body);
+    const contact = await createContact(req.body, req.user._id);
     
 
     res.status(201).json({
@@ -52,7 +66,7 @@ export const createContactController = async (req, res) => {
 };
 
 
-export const patchContactController = async (req, res, next) => {
+export const patchContactController = async (req, res) => {
    try {
     const { body } = req;
     const { contactId } = req.params;
