@@ -12,7 +12,7 @@ const authRouter = Router();
 
 authRouter.post('/register', validateBody(registerUserSchema), ctrlWrapper(registerUserController));
 authRouter.post('/login', ctrlWrapper(loginUserController), validateBody(loginUserSchema));
-authRouter.post('/reset-token', ctrlWrapper(refreshTokenController));
+authRouter.post('/refresh', ctrlWrapper(refreshTokenController));
 authRouter.post('/logout', ctrlWrapper(logoutUserController));
 
 

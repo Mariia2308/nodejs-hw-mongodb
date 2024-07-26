@@ -7,12 +7,12 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true },
     createdAt: { type: Date, default: Date.now }, 
     updatedAt: { type: Date, default: Date.now }, 
-    role: {
-    type: String,
-    required: true,
-    default: ['parent'],
-    enum: ['parent', 'teacher'],
-   },
+   // role: {
+   // type: String,
+   // required: true,
+   // default: ['parent'],
+   // enum: ['parent', 'teacher'],
+   //},
   },
   { timestamps: true, versionKey: false },
 );
