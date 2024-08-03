@@ -27,7 +27,7 @@ export const getAllContacts = async ({
 }) => {
   const skip = (page - 1) * perPage;
 
-  const ContactFilter = Contact.find();
+  const ContactFilter = Contact.find({ userId });
 
   if (filter.isFavourite !== undefined) {
     ContactFilter.where('isFavourite').equals(filter.isFavourite);
@@ -38,7 +38,7 @@ export const getAllContacts = async ({
   }
 
 
-  ContactFilter.where('parentId').equals(userId);
+  //ContactFilter.where('parentId').equals(userId);
 
   const [contactsCount, contacts] = await Promise.all([
     ContactFilter.clone().countDocuments(),
@@ -61,24 +61,35 @@ export const getContactById = async (contactId, userId) => {
     userId,
   });
     if (!contact) {
-        throw createHttpError(404, `Contact with id ${id} not found!`);
+        throw createHttpError(404, `Contact with id ${contactId} not found!`);
     }
   return contact;
 };
 
+
 export const createContact = async (payload, userId) => {
-  const contact = await Contact.create({ ...payload, parentId: userId });
+  
+  const contactData = { ...payload, userId };
+
+  const contact = await Contact.create(contactData);
+
   return contact;
 };
 
 
-export const upsertContact = async (id, payload, options = {}) => {
+export const upsertContact = async (contactId, payload,userId, options = {}) => {
   try {
-    const rawResult = await Contact.findOneAndUpdate(id, payload, {
+    const rawResult = await Contact.findOneAndUpdate(
+    {
+      _id: contactId,
+      userId,
+    },
+    payload,
+    {
       new: true,
-      upsert: true,
       ...options,
-    });
+    },
+  );
 
     if (!rawResult) {
       throw createHttpError(404, 'Contact not found');

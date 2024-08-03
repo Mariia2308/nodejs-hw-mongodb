@@ -13,7 +13,8 @@ const contactSchema = new Schema(
     },
     createdAt: { type: Date, default: Date.now }, 
     updatedAt: { type: Date, default: Date.now },
-    parentId:{type:Schema.ObjectId, required:true}
+    userId: {  type: Schema.Types.ObjectId, ref: 'users',required: true,},
+    //parentId:{type:Schema.ObjectId, required:true}
   },
   { timestamps: true, versionKey: false }
 );

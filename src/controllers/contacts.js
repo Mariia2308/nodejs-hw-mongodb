@@ -55,14 +55,37 @@ export const getContactByIdController = async (req, res, next) => {
 };
   
 export const createContactController = async (req, res) => {
-    const contact = await createContact(req.body, req.user._id);
-    
+    try {
+        // Validate that the user is authenticated
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({
+                status: 401,
+                message: 'Unauthorized. User ID is missing.',
+            });
+        }
 
-    res.status(201).json({
-        status: 201,
-        message: 'Successfully created contact!',
-        data: contact,
-    });
+        // Create the contact with the user ID
+        const contact = await createContact(req.body, req.user._id);
+
+        if (!contact) {
+            return res.status(400).json({
+                status: 400,
+                message: 'Failed to create contact.',
+            });
+        }
+
+        res.status(201).json({
+            status: 201,
+            message: 'Successfully created contact!',
+            data: contact,
+        });
+    } catch (error) {
+        console.error('Error creating contact:', error);
+        res.status(500).json({
+            status: 500,
+            message: 'Internal server error.',
+        });
+    }
 };
 
 

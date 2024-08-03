@@ -1,6 +1,6 @@
 
 import { createUser, logoutUser, refreshSession, loginUser } from "../services/auth.js";
-
+import createHttpError from "http-errors";
 const setupSessionCookies = (res, session) => {
   res.cookie('sessionId', session._id,
     {
@@ -21,7 +21,7 @@ const setupSessionCookies = (res, session) => {
 export const registerUserController = async (req, res) => {
   const user = await createUser(req.body);
 
-  res.json({
+  res.status(201).json({
     status: 201,
     message: 'Successfully registered a user',
     data: { user },
@@ -53,18 +53,26 @@ export const logoutUserController = async (req, res) => {
 };
 
 export const refreshTokenController = async (req, res) => {
-  const { sessionId, sessionToken } = req.cookies;
-  const session = await refreshSession({
-    sessionId,
-    sessionToken
-  });
+  try {
+    const { sessionId, sessionToken } = req.cookies;
 
-  setupSessionCookies(res, session);
+    if (!sessionId || !sessionToken) {
+      throw createHttpError(400, 'Session ID and token must be provided');
+    }
 
+    const session = await refreshSession({ sessionId, sessionToken });
 
-  res.json({
-    status: 200,
-    message: 'Token refreshed succesfuly!',
-    data: {  accessToken:session.accessToken  },
-  });
+    setupSessionCookies(res, session);
+
+    res.status(200).json({
+      status: 200,
+      message: 'Token refreshed successfully!',
+      data: { accessToken: session.accessToken },
+    });
+  } catch (error) {
+    res.status(error.status || 500).json({
+      status: error.status || 500,
+      message: error.message || 'Internal Server Error',
+    });
+  }
 };
