@@ -62,7 +62,8 @@ export const getContactById = async (contactId, userId) => {
   });
     if (!contact) {
         throw createHttpError(404, `Contact with id ${contactId} not found!`);
-    }
+  }
+
   return contact;
 };
 

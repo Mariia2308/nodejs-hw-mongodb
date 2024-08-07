@@ -37,21 +37,37 @@ export const getContactsController = async (req, res) => {
   }
 };
 
-
-
-
 export const getContactByIdController = async (req, res, next) => {
     const id = req.params.contactId;
-    if(!Types.ObjectId.isValid(id)) {
+    const userId = req.user._id;
+
+    if (!Types.ObjectId.isValid(id)) {
         return next(createHttpError(400, 'Invalid contact id!'));
     }
-    const contact = await getContactById(id);
-    
-    res.json({
-      status: 200,
-      message: `Successfully get contact with id ${id}!`,
-      data: contact,
-    });
+
+    try {
+        const contact = await getContactById(id);
+
+
+        if (contact.userId.toString() !== userId.toString()) {
+            return next(createHttpError(403, 'You do not have access to this contact!'));
+        }
+
+        res.json({
+            status: 200,
+            message: `Successfully retrieved contact with id ${id}!`,
+            data: contact,
+        });
+    } catch (error) {
+        if (error.status && error.message) {
+            return next(error);
+        }
+        console.error('Error in getContactByIdController:', error);
+        res.status(500).json({
+            status: 500,
+            message: 'Internal Server Error',
+        });
+    }
 };
   
 export const createContactController = async (req, res) => {
