@@ -78,7 +78,7 @@ export const createContact = async (payload, userId) => {
 };
 
 
-export const upsertContact = async (contactId, payload,userId, options = {}) => {
+export const upsertContact = async (contactId, payload, userId, options = {}) => {
   try {
     const rawResult = await Contact.findOneAndUpdate(
     {
@@ -108,8 +108,9 @@ export const upsertContact = async (contactId, payload,userId, options = {}) => 
 
 
 export const deleteContactById = async (contactId, userId) => {
-  await Contact.findOneAndDelete({
+  const result = await Contact.findOneAndDelete({
     _id: contactId,
     userId,
   });
+  return result;
 };

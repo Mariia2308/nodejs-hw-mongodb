@@ -42,16 +42,12 @@ export const getContactByIdController = async (req, res, next) => {
     const userId = req.user._id;
 
     if (!Types.ObjectId.isValid(id)) {
-        return next(createHttpError(400, 'Invalid contact id!'));
+        return next(createHttpError(422, 'Invalid contact id!'));
     }
 
     try {
-        const contact = await getContactById(id);
+        const contact = await getContactById(id, userId);
 
-
-        if (contact.userId.toString() !== userId.toString()) {
-            return next(createHttpError(403, 'You do not have access to this contact!'));
-        }
 
         res.json({
             status: 200,
@@ -61,18 +57,13 @@ export const getContactByIdController = async (req, res, next) => {
     } catch (error) {
         if (error.status && error.message) {
             return next(error);
-        }
-        console.error('Error in getContactByIdController:', error);
-        res.status(500).json({
-            status: 500,
-            message: 'Internal Server Error',
-        });
+      }
+      next(createHttpError(500, 'Internal Server Error'));
     }
 };
   
 export const createContactController = async (req, res) => {
     try {
-        // Validate that the user is authenticated
         if (!req.user || !req.user._id) {
             return res.status(401).json({
                 status: 401,
@@ -80,7 +71,6 @@ export const createContactController = async (req, res) => {
             });
         }
 
-        // Create the contact with the user ID
         const contact = await createContact(req.body, req.user._id);
 
         if (!contact) {
@@ -105,18 +95,16 @@ export const createContactController = async (req, res) => {
 };
 
 
-export const patchContactController = async (req, res) => {
+export const patchContactController = async (req, res, next) => {
    try {
     const { body } = req;
-    const { contactId } = req.params;
-    const result = await upsertContact(contactId, body);
+     const { contactId } = req.params;
+     const userId = req.user._id;
+    const result = await upsertContact(contactId, body, userId);
 
-    if (!result.contact) {
-      return res.status(404).json({
-        status: 404,
-        message: `Contact with id ${contactId} not found!`,
-      });
-    }
+        if (!result.contact) {
+            return next(createHttpError(404, `Contact with id ${contactId} not found!`));
+        }
 
     res.status(200).json({
       status: 200,
@@ -124,18 +112,17 @@ export const patchContactController = async (req, res) => {
       data: result.contact,
     });
   } catch (error) {
-    console.error('Error in patchContactController:', error);
-    res.status(500).json({
-      status: 500,
-      message: 'Internal Server Error',
-    });
+     console.error('Error in patchContactController:', error);
+     next(createHttpError(500, 'Internal Server Error'));
   }
 };
 
 export const putContactController = async (req, res) => {
   const { body } = req;
   const { contactId } = req.params;
-  const { isNew, contact } = await upsertContact(contactId, body, {
+  const userId = req.user._id; 
+  
+  const { isNew, contact } = await upsertContact(contactId, body, userId, {
     upsert: true,
   });
 
@@ -147,19 +134,24 @@ export const putContactController = async (req, res) => {
     data: contact,
   });
 };
-export const deleteContactByIdController = async (req, res) => {
- const id = req.params.contactId;
-  const contact = await getContactById(id);
-  
-  if (!contact) {
-    return res.status(404).json({
-      status: 404,
-      message: `Contact with id ${id} not found!`,
-    });
-  }
-  
+export const deleteContactByIdController = async (req, res, next) => {
+  const id = req.params.contactId;
+  const userId = req.user._id;  
 
-  await deleteContactById(id);
-  
-  res.status(204).send();
+  try {
+    const result = await deleteContactById(id, userId);
+
+    if (!result) {
+      return res.status(404).json({
+        status: 404,
+        message: `Contact with id ${id} not found!`,
+      });
+    }
+
+      res.status(204).send();
+  } catch (error) {
+    console.error('Error in deleteContactByIdController:', error);
+    next(createHttpError(500, 'Internal Server Error'));
+  } 
+
 };
