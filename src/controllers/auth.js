@@ -1,6 +1,7 @@
 
-import { createUser, logoutUser, refreshSession, loginUser } from "../services/auth.js";
+import { createUser, logoutUser, refreshSession, loginUser, sendResetEmail, sendResetPassword } from "../services/auth.js";
 import createHttpError from "http-errors";
+
 const setupSessionCookies = (res, session) => {
   res.cookie('sessionId', session._id,
     {
@@ -75,4 +76,32 @@ export const refreshTokenController = async (req, res) => {
       message: error.message || 'Internal Server Error',
     });
   }
+};
+
+export const sendResetEmailController = async (req, res) => {
+  try {
+    console.log("Received email:", req.body.email);
+    await sendResetEmail(req.body.email);
+    res.json({
+      status: 200,
+      message: 'Reset password email was successfully sent!',
+      data: {},
+    });
+  } catch (error) {
+    console.error("Error in sendResetEmailController:", error);
+    res.status(500).json({
+      status: 500,
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+export const sendResetPasswordController = async (req, res) => {
+  await sendResetPassword(req.body);
+
+  res.json({
+    status: 200,
+    message: 'Password was successfully reset!',
+    data: {},
+  });
 };
