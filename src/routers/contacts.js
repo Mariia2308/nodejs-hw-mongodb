@@ -22,11 +22,11 @@ contactRouter.get('/', ctrlWrapper(getContactsController));
 contactRouter.get('/:contactId', validateMongoId('contactId'), ctrlWrapper(getContactByIdController));
 contactRouter.post(
   '/',
-  upload.single('avatar'),
+  upload.single('photo'),
   validateBody(createContactsSchema),
   ctrlWrapper(createContactController),
 );
-contactRouter.patch('/:contactId', validateMongoId('contactId'), validateBody(updateContactsSchema), ctrlWrapper(patchContactController));
+contactRouter.patch('/:contactId', upload.single('photo'), validateMongoId('contactId'), validateBody(updateContactsSchema), ctrlWrapper(patchContactController));
 contactRouter.put('/:contactId', validateMongoId('contactId'), validateBody(createContactsSchema), ctrlWrapper(putContactController));
 contactRouter.delete('/:contactId', validateMongoId('contactId'), ctrlWrapper(deleteContactByIdController));
 

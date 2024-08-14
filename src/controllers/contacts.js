@@ -3,6 +3,7 @@ import { getAllContacts, getContactById,upsertContact, createContact, deleteCont
 import createHttpError from "http-errors";
 import { parsePaginationParams } from "../pagination/paginationParams.js";
 import { parseFilters } from "../utils/parseFilters.js";
+import { saveFile } from "../utils/saveFile.js";
 
 export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -69,9 +70,10 @@ export const createContactController = async (req, res) => {
                 status: 401,
                 message: 'Unauthorized. User ID is missing.',
             });
-        }
+      };
 
-        const contact = await createContact(req.body, req.user._id);
+       const photoUrl = req.file ? await saveFile(req.file) : null;
+        const contact = await createContact(req.body, req.user._id, photoUrl);
 
         if (!contact) {
             return res.status(400).json({
@@ -107,12 +109,12 @@ export const patchContactController = async (req, res, next) => {
 
     const payload = { ...body };
     if (file) {
-      payload.avatar = file;
+      payload.photo = file;
     } else {
-      delete payload.avatar;
+      delete payload.photo;
     }
 
-    const result = await upsertContact(contactId, { ...body, avatar: file }, userId);
+    const result = await upsertContact(contactId, { ...body, photo: file }, userId);
 
     if (!result.contact) {
       return next(createHttpError(404, `Contact with id ${contactId} not found!`));
