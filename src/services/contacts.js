@@ -1,5 +1,8 @@
 import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contacts.js';
+import { saveFile } from '../utils/saveFile.js';
+
+
 
 const createPaginationInfo = (page, perPage, total) => {
   const totalPages = Math.ceil(total / perPage);
@@ -78,19 +81,33 @@ export const createContact = async (payload, userId) => {
 };
 
 
-export const upsertContact = async (contactId, payload, userId, options = {}) => {
+export const upsertContact = async (contactId,   {avatar,...payload}, userId, options = {}) => {
   try {
+
+    let avatarUrl = '';
+    if (avatar) {
+      avatarUrl = await saveFile(avatar);
+    }
+
+    const updateData = { ...payload };
+    if (avatarUrl) {
+      updateData.avatarUrl = avatarUrl;
+    }
+
     const rawResult = await Contact.findOneAndUpdate(
-    {
-      _id: contactId,
-      userId,
-    },
-    payload,
-    {
-      new: true,
-      ...options,
-    },
-  );
+      {
+        _id: contactId,
+        userId,
+      },
+      updateData,
+      {
+        new: true,
+        upsert: true,
+        ...options,
+      },
+    );
+    
+    
 
     if (!rawResult) {
       throw createHttpError(404, 'Contact not found');

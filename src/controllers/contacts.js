@@ -96,26 +96,39 @@ export const createContactController = async (req, res) => {
 
 
 export const patchContactController = async (req, res, next) => {
-   try {
-    const { body } = req;
-     const { contactId } = req.params;
-     const userId = req.user._id;
-    const result = await upsertContact(contactId, body, userId);
+  try {
+    const { body, file } = req;
+    const { contactId } = req.params;
+    const userId = req.user._id;
 
-        if (!result.contact) {
-            return next(createHttpError(404, `Contact with id ${contactId} not found!`));
-        }
+    if (!contactId) {
+      return next(createHttpError(400, 'Contact ID is required.'));
+    }
+
+    const payload = { ...body };
+    if (file) {
+      payload.avatar = file;
+    } else {
+      delete payload.avatar;
+    }
+
+    const result = await upsertContact(contactId, { ...body, avatar: file }, userId);
+
+    if (!result.contact) {
+      return next(createHttpError(404, `Contact with id ${contactId} not found!`));
+    }
 
     res.status(200).json({
       status: 200,
-      message: `Successfully patched contact!`,
+      message: 'Successfully patched contact!',
       data: result.contact,
     });
   } catch (error) {
-     console.error('Error in patchContactController:', error);
-     next(createHttpError(500, 'Internal Server Error'));
+    console.error('Error in patchContactController:', error);
+    next(createHttpError(500, 'Internal Server Error'));
   }
 };
+
 
 export const putContactController = async (req, res) => {
   const { body } = req;
