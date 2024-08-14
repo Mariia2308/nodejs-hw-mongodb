@@ -17,7 +17,3 @@ export const initMongoDB = async () => {
     throw err;
   }
 };
-
-
-
-
