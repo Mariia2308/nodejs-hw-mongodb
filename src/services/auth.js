@@ -10,6 +10,7 @@ import fs from 'fs/promises';
 import path from 'node:path';
 import { sendMail } from "../utils/sendMail.js";
 import jwt from 'jsonwebtoken';
+import { validateGoogleOAuthCode } from "../utils/googleOAuth.js";
 
 
 
@@ -158,6 +159,36 @@ export const sendResetEmail = async (email) => {
     console.error("Error sending email:", err);
     throw createHttpError(500, 'Problem with sending emails');
   }
+};
+
+export const loginOrSignupWithGoogleOAuth = async (code) => {
+  const payload = await validateGoogleOAuthCode(code);
+
+  if (!payload) throw createHttpError(401);
+
+  let user = await User.findOne({ email: payload.email });
+
+  if (!user) {
+    const hashedPassword = await bcrypt.hash(
+      crypto.randomBytes(40).toString('base64'),
+      10,
+    );
+
+    user = await User.create({
+      name: payload.given_name + ' ' + payload.family_name,
+      email: payload.email,
+      password: hashedPassword,
+    });
+  }
+
+  await Session.deleteOne({
+    userId: user._id,
+  });
+
+  return await Session.create({
+    userId: user._id,
+    ...createSession(),
+  });
 };
 
 

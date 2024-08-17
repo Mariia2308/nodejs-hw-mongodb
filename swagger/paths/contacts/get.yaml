@@ -1,0 +1,86 @@
+tags:
+  - Contacts
+summary: Get all contacts
+operationId: getAllContacts
+description: Retrieve all contacts
+parameters:
+  - in: query
+    name: page
+    schema:
+      type: integer
+      minimum: 1
+      default: 1
+    description: Page number for pagination
+  - in: query
+    name: perPage
+    schema:
+      type: integer
+      minimum: 1
+      maximum: 100
+      default: 10
+    description: Number of items per page
+  - in: query
+    name: sortBy
+    schema:
+      type: string
+      enum: [name, email, phone]
+      default: name
+    description: Field to sort by
+  - in: query
+    name: sortOrder
+    schema:
+      type: string
+      enum: [asc, desc]
+      default: asc
+    description: Sort order (ascending or descending)
+responses:
+  '200':
+    description: Successfully retrieved contacts
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully found contacts!
+            data:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: ..\..\components\schemas\contact.yaml
+                page:
+                  type: integer
+                perPage:
+                  type: integer
+                totalItems:
+                  type: integer
+                totalPages:
+                  type: integer
+                hasPreviousPage:
+                  type: boolean
+                hasNextPage:
+                  type: boolean
+  '404':
+    description: Contacts not found
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+          properties:
+            status:
+              type: integer
+              example: 404
+            message:
+              type: string
+              example: NotFoundError
+security:
+  - bearerAuth: []

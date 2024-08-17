@@ -1,0 +1,19 @@
+tags:
+  - Contacts
+summary: Get contact by id
+operationId: getContact
+description: 'You can get access only to children added by you'
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: id
+    required: true
+    schema:
+      type: string
+      example: '66b4e999716aed34cf8c0f9a'
+responses:
+  '200':
+    $ref: '../../../components/responses/200.yaml'
+  '401':
+    $ref: '../../../components/responses/401.yaml'

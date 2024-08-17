@@ -15,7 +15,6 @@ const contactSchema = new Schema(
     updatedAt: { type: Date, default: Date.now },
     photo: { type: String },
     userId: {  type: Schema.Types.ObjectId, ref: 'users',required: true},
-    //parentId:{type:Schema.ObjectId, required:true}
   },
   { timestamps: true, versionKey: false }
 );

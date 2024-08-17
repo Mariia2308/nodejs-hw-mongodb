@@ -1,6 +1,7 @@
 
-import { createUser, logoutUser, refreshSession, loginUser, sendResetEmail, sendResetPassword } from "../services/auth.js";
+import { createUser, logoutUser, refreshSession, loginUser, sendResetEmail, sendResetPassword, loginOrSignupWithGoogleOAuth } from "../services/auth.js";
 import createHttpError from "http-errors";
+import { generateOAuthURL } from "../utils/googleOAuth.js";
 
 const setupSessionCookies = (res, session) => {
   res.cookie('sessionId', session._id,
@@ -17,6 +18,31 @@ const setupSessionCookies = (res, session) => {
     }
   );
   
+};
+
+export const getOAuthURLController = async (req, res) => {
+  const url = generateOAuthURL();
+
+  res.json({
+    status: 200,
+    message: 'Successfully received oauth url!',
+    data: {
+      url,
+    },
+  });
+};
+
+export const verifyGoogleOAuthController = async (req, res) => {
+  const { code } = req.body;
+  const session = await loginOrSignupWithGoogleOAuth(code);
+
+  setupSessionCookies(res, session);
+
+  res.json({
+    status: 200,
+    message: 'Logged in with Google OAuth!',
+    data: { accessToken: session.accessToken },
+  });
 };
 
 export const registerUserController = async (req, res) => {
@@ -96,6 +122,8 @@ export const sendResetEmailController = async (req, res) => {
     });
   }
 };
+
+
 export const sendResetPasswordController = async (req, res) => {
   await sendResetPassword(req.body);
 

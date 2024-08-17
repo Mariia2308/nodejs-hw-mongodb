@@ -1,0 +1,30 @@
+type: object
+required:
+  - _id
+  - name
+  - email
+properties:
+  _id:
+    description: "Contact's id"
+    type: string
+    example: 66b4e999716aed34cf8c0f9a
+  name:
+    description: "Contact's name"
+    type: string
+    example: 'Sergey Krimenko'
+  email:
+    description: "Contact's email address"
+    type: string
+    example: 'admin@gmail.com'
+  phoneNumber:
+    description: "Contact's phone number"
+    type: string
+    example: '+380501234567'
+  photo:
+    description: "Link to contact's photo"
+    type: string
+    example: <https://res.cloudinary.com/uqwgdu/image/upload/image.png>
+  userId:
+    description: 'User id associated with the contact'
+    type: string
+    example: 66b4e999716aed34cf8c0f9a
