@@ -85,17 +85,19 @@ export const createContact = async (payload, userId,photoUrl) => {
 };
 
 
-export const upsertContact = async (contactId,   {photo,...payload}, userId, options = {}) => {
+export const upsertContact = async (contactId, { photo, ...payload }, userId, options = {}) => {
   try {
+    let photoUrl = '';
 
-    let avatarUrl = '';
+
     if (photo) {
-      avatarUrl = await saveFile(photo);
+      photoUrl = await saveFile(photo);
     }
 
+   
     const updateData = { ...payload };
-    if (avatarUrl) {
-      updateData.avatarUrl = avatarUrl;
+    if (photoUrl) {
+      updateData.photo = photoUrl; 
     }
 
     const rawResult = await Contact.findOneAndUpdate(
@@ -108,10 +110,8 @@ export const upsertContact = async (contactId,   {photo,...payload}, userId, opt
         new: true,
         upsert: true,
         ...options,
-      },
+      }
     );
-    
-    
 
     if (!rawResult) {
       throw createHttpError(404, 'Contact not found');
@@ -126,7 +126,6 @@ export const upsertContact = async (contactId,   {photo,...payload}, userId, opt
     throw createHttpError(500, 'Internal Server Error');
   }
 };
-
 
 export const deleteContactById = async (contactId, userId) => {
   const result = await Contact.findOneAndDelete({

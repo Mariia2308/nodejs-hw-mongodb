@@ -10,6 +10,7 @@ export const createContactsSchema = Joi.object(
     contactType: Joi.string().valid('work', 'home', 'personal'),
     createdAt: Joi.date().default(Date.now), 
     updatedAt: Joi.date().default(Date.now),  
+    photo: Joi.string(),
   },
   { timestamps: true, versionKey: false }
 );

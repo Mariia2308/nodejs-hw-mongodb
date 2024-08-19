@@ -126,19 +126,11 @@ export const sendResetEmail = async (email) => {
   );
  
 
-  const templatePath = path.join(TEMPLATE_DIR, 'send-reset-password-email.html');
- 
+  const templateSource = await fs.readFile(
+    path.join(TEMPLATE_DIR, 'send-reset-password-email.html'),
+  );
 
-  let templateSource;
-  try {
-    templateSource = await fs.readFile(templatePath, 'utf-8');
-   
-  } catch (err) {
-    console.error("Error reading template:", err);
-    throw createHttpError(500, 'Problem with reading email template');
-  }
-
-  const template = Handlebars.compile(templateSource);
+  const template = Handlebars.compile(templateSource.toString());
   
   const html = template({
     name: user.name,
