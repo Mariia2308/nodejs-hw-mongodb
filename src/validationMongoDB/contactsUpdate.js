@@ -9,7 +9,9 @@ export const updateContactsSchema = Joi.object(
     isFavourite: Joi.boolean(),
     contactType: Joi.string().valid('work', 'home', 'personal').required(),
     createdAt: Joi.date().default(Date.now), 
-    updatedAt: Joi.date().default(Date.now),  
+    updatedAt: Joi.date(
+      
+    ).default(Date.now),  
     photo: Joi.string(),
   },
   { timestamps: true, versionKey: false }
