@@ -11,7 +11,7 @@ properties:
   name:
     description: "Contact's name"
     type: string
-    example: 'Sergey Krimenko'
+    example: 'Sergey Krasavsky'
   email:
     description: "Contact's email address"
     type: string

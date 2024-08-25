@@ -1,19 +1,34 @@
 tags:
   - Contacts
-summary: Get contact by id
-operationId: getContact
-description: 'You can get access only to children added by you'
-security:
-  - bearerAuth: []
+summary: Get a contact by ID
+operationId: getContactById
+description: Retrieve a single contact by its ID
 parameters:
   - in: path
     name: id
     required: true
+    description: ID of the contact to retrieve
     schema:
       type: string
-      example: '66b4e999716aed34cf8c0f9a'
+      example: '66538e731c2dc811b051b936'
 responses:
   '200':
-    $ref: '../../../components/responses/200.yaml'
-  '401':
-    $ref: '../../../components/responses/401.yaml'
+    $ref: ..\..\..\components\responses\200.yaml
+  '404':
+    description: Contact not found
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+          properties:
+            status:
+              type: integer
+              example: 404
+            message:
+              type: string
+              example: NotFoundError
+security:
+  - bearerAuth: []
