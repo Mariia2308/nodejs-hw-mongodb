@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import swaggerUi from 'swagger-ui-express';
 import { SWAGGER_PATH } from '../constants/index.js';
 
-export const swagger = () => {
+export const swaggerDocs = () => {
   try {
     const swaggerDocument = JSON.parse(
       fs.readFileSync(SWAGGER_PATH).toString(),

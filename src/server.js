@@ -7,14 +7,14 @@ import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js'
 import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
 import rootRouter from './routers/index.js';
 import cookieParser from 'cookie-parser';
-import { swagger } from './middlewares/swaggerDocs.js'; // import swagger from './middlewares/swaggerDocs.js';
+import { swaggerDocs } from './middlewares/swaggerDocs.js'; // import swagger from './middlewares/swaggerDocs.js';
 
 
 
 export const startServer = () => {
   const app = express();
 
-  app.use('/api-docs', swagger());
+  app.use('/api-docs', swaggerDocs());
 
   app.use(express.json({
     limit: '10kb',
