@@ -23,9 +23,9 @@ requestBody:
           email:
             type: string
             format: email
-          phone:
+          phoneNumber:
             type: string
-          photo:
+          //photo:
             type: string
             format: binary
 responses:
@@ -60,5 +60,22 @@ responses:
             message:
               type: string
               example: NotFoundError
+  '400':
+    description: Bad request, invalid data provided
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+          properties:
+            status:
+              type: integer
+              example: 404
+            message:
+              type: string
+              example: NotFoundError
+
 security:
   - bearerAuth: []

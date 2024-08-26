@@ -7,11 +7,14 @@ import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js'
 import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
 import rootRouter from './routers/index.js';
 import cookieParser from 'cookie-parser';
+import { swagger } from './middlewares/swaggerDocs.js'; // import swagger from './middlewares/swaggerDocs.js';
 
 
 
 export const startServer = () => {
   const app = express();
+
+  app.use('/api-docs', swagger());
 
   app.use(express.json({
     limit: '10kb',
@@ -21,13 +24,13 @@ export const startServer = () => {
   app.use(cookieParser());
 
 
-  app.use(
-    pino({
-      transport: {
-        target: 'pino-pretty',
-      },
-    }),
-  );
+  //app.use(
+  //  pino({
+  //    transport: {
+  //      target: 'pino-pretty',
+  //    },
+  //  }),
+  //);
 
   app.use('/uploads', express.static(UPLOAD_DIR));
   app.use(rootRouter);

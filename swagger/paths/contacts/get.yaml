@@ -23,7 +23,7 @@ parameters:
     name: sortBy
     schema:
       type: string
-      enum: [name, email, phone]
+      enum: [name, email, phoneNumber]
       default: name
     description: Field to sort by
   - in: query

@@ -17,7 +17,7 @@ requestBody:
             type: string
             format: email
             description: Email address of the contact
-          phone:
+          phoneNumber:
             type: string
             description: Phone number of the contact
           photo:
@@ -52,7 +52,7 @@ responses:
           properties:
             status:
               type: integer
-              example: 404
+              example: 400
             message:
               type: string
               example: NotFoundError
